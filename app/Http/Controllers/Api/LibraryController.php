@@ -12,7 +12,8 @@ final class LibraryController extends BaseController
     {
         return $this->jsonResponse(
             message: 'success',
-            data: $this->getUser()->likes()->paginate()
+            data: $this->getUser()->likes()
+                    ->latest()->paginate()
         );
     }
 
@@ -28,8 +29,7 @@ final class LibraryController extends BaseController
 
         return $this->jsonResponse(
             status: 201,
-            message: 'Like added',
-            data: $like
+            message: 'Added to likes',
         );
     }
 

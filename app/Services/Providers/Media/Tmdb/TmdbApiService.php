@@ -23,13 +23,18 @@ final class TmdbApiService implements MediaProviderI
 	public function __construct(
         private readonly TmdbTransformer $transformer
     ) {
-        // set http client
+        // set http client with throw on failure
         $this->http = Http::withHeaders([
             'Authorization' => 'Bearer '.config('tmdb.api_key'),
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
-        ])->baseUrl(config('tmdb.base_url').'/');
+        ])->throw()->baseUrl(config('tmdb.base_url').'/');
     }
+
+	public function getProviderName(): string
+	{
+		return 'tmdb';
+	}
 
 	public function setPage(int $page): self
 	{
@@ -66,24 +71,15 @@ final class TmdbApiService implements MediaProviderI
      */
     private function getFeaturedMovies(): array
     {
-        $featured = [];
 		$request = $this->http->get('discover/movie', [
             'with_original_language' => 'en',
             'sort_by' => 'popularity.desc',
             'with_release_type' => '2|3'
 		]);
 
-        if (! $request->successful()) {
-            $request->throw();
-        }
-
-        $response = $request->json();
-        foreach ($response['results'] as $result) {
-			$featured[] = $this->transform($result)
-				->to('movieSummary');
-        }
-
-        return $featured;
+		return $this->transformResults(
+			$request->json()['results'], 'movieSummary'
+		);
     }
 
     /**
@@ -92,23 +88,14 @@ final class TmdbApiService implements MediaProviderI
      */
     private function getFeaturedShows(): array
     {
-        $featured = [];
 		$request = $this->http->get('discover/tv', [
             'with_original_language' => 'en',
             'sort_by' => 'popularity.desc'
 		]);
 
-        if (! $request->successful()) {
-            $request->throw();
-        }
-
-        $response = $request->json();
-        foreach ($response['results'] as $result) {
-			$featured[] = $this->transform($result)
-				->to('tvSummary');
-        }
-
-        return $featured;
+		return $this->transformResults(
+			$request->json()['results'], 'tvSummary'
+		);
     }
 
 	public function getTrending(string $type = 'all'): array
@@ -135,7 +122,6 @@ final class TmdbApiService implements MediaProviderI
      */
     private function getTrendingMovies(string $period = 'day'): array
     {
-        $trending = [];
 		$request = $this->http->get('trending/movie/'.$period, [
 			'query' => [
 				'page' => $this->page,
@@ -143,20 +129,13 @@ final class TmdbApiService implements MediaProviderI
 			]
 		]);
 
-        $response = $request->json();
-
-        foreach ($response['results'] as $result) {
-			$trending[] = $this->transformer
-				->transform($result)
-				->to('movieSummary');
-        }
-
-        return $trending;
+		return $this->transformResults(
+			$request->json()['results'], 'movieSummary'
+		);
     }
 
     private function getTrendingShows(string $period = 'day'): array
     {
-        $trending = [];
 		$request = $this->http->get('trending/tv/'.$period, [
 			'query' => [
 				'page' => $this->page,
@@ -164,28 +143,16 @@ final class TmdbApiService implements MediaProviderI
 			]
 		]);
 
-        $response = json_decode($request->getBody()->getContents(), true);
-        foreach ($response['results'] as $result) {
-			$trending[] = $this->transformer
-				->transform($result)
-				->to('tvSummary');
-        }
-
-        return $trending;
+		return $this->transformResults(
+			$request->json()['results'], 'tvSummary'
+		);
     }
 
 	private function getAiringShows(string $timezone): array
     {
-        $aring = [];
-
-		// get date based on timezone
 		$date = Carbon::now($timezone);
-
-		// get beginning and end of week
-		$beginningOfWeek = $date->startOfWeek()
-			->format('Y-m-d');
-		$endOfWeek = $date->endOfWeek()
-			->format('Y-m-d');
+		$beginningOfWeek = $date->startOfWeek()->format('Y-m-d');
+		$endOfWeek = $date->endOfWeek()->format('Y-m-d');
 
 		$request = $this->http->get('discover/tv', [
 			'query' => [
@@ -197,24 +164,14 @@ final class TmdbApiService implements MediaProviderI
 			]
 		]);
 
-        $response = json_decode($request->getBody()->getContents(), true);
-        foreach ($response['results'] as $result) {
-            $aring[] = $this->transformer
-				->transform($result)
-				->to('tvSummary');
-        }
-
-        return $aring;
+		return $this->transformResults(
+			$request->json()['results'], 'tvSummary'
+		);
     }
 
 	private function getAiringMovies(string $timezone): array
     {
-        $aring = [];
-
-		// get date based on timezone
 		$date = Carbon::now($timezone);
-
-		// get beginning and end of week
 		$beginningOfWeek = $date->startOfWeek()->format('Y-m-d');
 		$endOfWeek = $date->endOfWeek()->format('Y-m-d');
 
@@ -228,14 +185,9 @@ final class TmdbApiService implements MediaProviderI
 			]
 		]);
 
-        $response = json_decode($request->getBody()->getContents(), true);
-        foreach ($response['results'] as $result) {
-			$aring[] = $this->transformer
-				->transform($result)
-				->to('movieSummary');
-        }
-
-        return $aring;
+		return $this->transformResults(
+			$request->json()['results'], 'movieSummary'
+		);
     }
 
 	public function getAiring(string $timezone): array
@@ -362,8 +314,13 @@ final class TmdbApiService implements MediaProviderI
         return $results;
     }
 
-    private function transform(mixed $data): TmdbTransformer
-    {
-        return $this->transformer->transform($data);
-    }
+	private function transformResults(array $data, string $type): array
+	{
+		return array_map(
+			fn ($result) => $this->transformer
+				->transform($result)
+				->to($type),
+			$data
+		);
+	}
 }

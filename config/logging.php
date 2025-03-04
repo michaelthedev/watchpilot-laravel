@@ -127,6 +127,13 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        // logging channel for media service
+        'media' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/media.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];

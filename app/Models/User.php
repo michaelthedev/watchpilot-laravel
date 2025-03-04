@@ -42,6 +42,11 @@ final class User extends Authenticatable
         return $this->hasMany(MediaLike::class);
     }
 
+    public function library(): HasMany
+    {
+        return $this->hasMany(UserLibrary::class);
+    }
+
     public function getJWTIdentifier(): mixed
     {
         return $this->getKey();

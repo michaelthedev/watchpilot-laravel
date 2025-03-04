@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\DiscoverController;
 use App\Http\Controllers\Api\LibraryController;
 use App\Http\Controllers\Api\WatchlistController;
+use App\Http\Controllers\Api\MiscController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/status', function () {
@@ -18,14 +19,19 @@ Route::group(['prefix' => '/auth'], function() {
 });
 
 Route::group(['prefix' => '/discover'], function() {
-   Route::get('/search', [DiscoverController::class, '']);
-   Route::get('/airing/{type?}', [DiscoverController::class, '']);
-   Route::get('/trending/{type?}', [DiscoverController::class, '']);
+   Route::get('/search', [DiscoverController::class, 'search']);
+   Route::get('/airing/{type?}', [DiscoverController::class, 'airing']);
+   Route::get('/trending/{type?}', [DiscoverController::class, 'trending']);
    Route::get('/featured/{type?}', [DiscoverController::class, 'featured']);
 });
 
 Route::middleware('auth:api')->group(function() {
     Route::apiResource('watchlist', WatchlistController::class);
+    Route::group(['prefix' => '/watchlist'], function() {
+        Route::get('/{uid}/item', [WatchlistController::class, 'items']);
+        Route::post('/{uid}/item', [WatchlistController::class, 'addItem']);
+        Route::delete('/{uid}/item', [WatchlistController::class, 'deleteItem']);
+    });
 
     Route::group(['prefix' => '/library'], function() {
         Route::get('/likes', [LibraryController::class, 'likes']);
@@ -39,4 +45,9 @@ Route::middleware('auth:api')->group(function() {
 
         Route::post('/sync', []);
     });
+});
+
+
+Route::group(['prefix' => '/misc'], function() {
+    Route::get('/timezones', [MiscController::class, 'timezones']);
 });

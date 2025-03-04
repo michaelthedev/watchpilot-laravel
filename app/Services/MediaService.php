@@ -9,7 +9,6 @@ use App\Services\Providers\Media\Tmdb\TmdbApiService;
 
 final class MediaService
 {
-
     public function clearCache(): self
     {
         cache()->forget('discover.featured.all');
@@ -27,35 +26,64 @@ final class MediaService
         return $this;
     }
 
-    public function search(): array
+    public function search(string $term, ?string $type = null): array
     {
+        $type = $type ?? 'all';
         return [];
     }
 
-    public function trending(): array
+    public function getTrending(?string $type = null): array
     {
-        return [];
+        $type = $type ?? 'all';
+        $expiry = now()->addHours(6);
+
+        try {
+            return cache()->remember('discover.trending.' . $type, $expiry,
+                function() use ($type) {
+                    return $this->getProvider()->getTrending($type);
+                }
+            );
+        } catch (\Exception $e) {
+            logger()->channel('media')
+                ->error('Trending error: ' . $e->getMessage());
+            return [];
+        }
     }
 
-    public function airing(): array
+    public function airing(?string $type = null, string $timezone = 'UTC'): array
     {
-        return [];
+        $type = $type ?? 'all';
+        $expiry = now()->addHours(12);
+
+        try {
+            return cache()->remember('discover.airing.' . $type, $expiry,
+                function() use ($type, $timezone) {
+                    return $this->getProvider()->getAiring($timezone);
+                }
+            );
+        } catch (\Exception $e) {
+            logger()->channel('media')
+                ->error('Airing error: ' . $e->getMessage());
+            return [];
+        }
     }
 
-    public function getFeatured(string $type = 'all'): array
+    public function getFeatured(?string $type = null): array
     {
+        $type = $type ?? 'all';
         $expiry = now()->startOfDay()->addDay();
 
-        /*try {
-
+        try {
+            return cache()->remember('discover.featured.'.$type, $expiry,
+                function() use ($type) {
+                    return $this->getProvider()->getFeatured($type);
+                }
+            );
         } catch (\Exception $e) {
-
-        }*/
-        return cache()->remember('discover.featured'.$type, $expiry,
-            function() use ($type) {
-                return $this->getProvider()->getFeatured($type);
-            }
-        );
+            logger()->channel('media')
+                ->error('Featured error: ' . $e->getMessage());
+            return [];
+        }
     }
 
     private function getProvider(): MediaProviderI
