@@ -13,7 +13,7 @@ final class MovieDetail extends BaseDTO
         public string $title,
         public string $overview,
         public float $rating,
-        public string $imageUrl,
+        public ?string $imageUrl,
         public int $releaseYear,
         public string $releaseDate,
 		public array $trailers = [],
