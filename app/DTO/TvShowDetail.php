@@ -9,9 +9,9 @@ namespace App\DTO;
  * @package App\DTO
  * @author Michael A. <michael@logad.net>
  */
-final class ShowDetail extends BaseDTO
+final class TvShowDetail extends BaseDTO
 {
-	public string $type = 'show';
+	public string $type = 'tv-show';
 
 	public function __construct(
         public int $id,

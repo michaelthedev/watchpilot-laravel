@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Providers\Media\Tmdb;
 
 use App\DTO\MovieDetail;
-use App\DTO\ShowDetail;
+use App\DTO\TvShowDetail;
 use App\DTO\TvEpisode;
 use App\DTO\TvSeason;
 use DateTimeImmutable;
@@ -24,7 +24,7 @@ final class TmdbTransformer
     /**
      * @throws Exception
      */
-    public function to(string $type): MovieDetail|array|ShowDetail|TvSeason
+    public function to(string $type): MovieDetail|array|TvShowDetail|TvSeason
 	{
 		return match ($type) {
 			'movie' => $this->transformMovie($this->data),
@@ -67,9 +67,9 @@ final class TmdbTransformer
 		];
 	}
 
-	private function transformTv(array $data): ShowDetail
+	private function transformTv(array $data): TvShowDetail
 	{
-		return new ShowDetail(
+		return new TvShowDetail(
 			id: $data['id'],
 			title: $data['name'],
 			genres: $data['genres'],
@@ -94,7 +94,7 @@ final class TmdbTransformer
 	{
 		return [
 			'id' => $data['id'],
-			'type' => 'tv',
+			'type' => 'tv-show',
 			'title' => htmlentities($data['name']),
 			'overview' => htmlentities($data['overview'], 30),
 			'rating' => round($data['vote_average'], 2, PHP_ROUND_HALF_DOWN),

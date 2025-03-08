@@ -22,7 +22,7 @@ final class DiscoverController extends BaseController
         );
     }
 
-    public function trending(Request $request, ?string $type = null): JsonResponse
+    public function trending(?string $type = null): JsonResponse
     {
         return $this->jsonResponse(
             message: 'Trending results',
@@ -30,7 +30,7 @@ final class DiscoverController extends BaseController
         );
     }
 
-    public function airing(Request $request, ?string $type = null): JsonResponse
+    public function airing(?string $type = null): JsonResponse
     {
         return $this->jsonResponse(
             message: 'Airing results',

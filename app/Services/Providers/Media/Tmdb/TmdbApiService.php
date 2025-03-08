@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Providers\Media\Tmdb;
 
 use App\DTO\MovieDetail;
-use App\DTO\ShowDetail;
+use App\DTO\TvShowDetail;
 use App\DTO\TvSeason;
 use App\Interfaces\Providers\MediaProviderI;
 use Carbon\Carbon;
@@ -103,7 +103,7 @@ final class TmdbApiService implements MediaProviderI
 		return match ($type) {
 			'all' => $this->getTrendingMoviesAndShows(),
 			'movies' => $this->getTrendingMovies(),
-			'shows' => $this->getTrendingShows(),
+			'tv-shows' => $this->getTrendingShows(),
 			default => []
 		};
 	}
@@ -123,10 +123,8 @@ final class TmdbApiService implements MediaProviderI
     private function getTrendingMovies(string $period = 'day'): array
     {
 		$request = $this->http->get('trending/movie/'.$period, [
-			'query' => [
-				'page' => $this->page,
-				'with_original_language' => 'en'
-			]
+            'page' => $this->page,
+            'with_original_language' => 'en'
 		]);
 
 		return $this->transformResults(
@@ -137,10 +135,8 @@ final class TmdbApiService implements MediaProviderI
     private function getTrendingShows(string $period = 'day'): array
     {
 		$request = $this->http->get('trending/tv/'.$period, [
-			'query' => [
-				'page' => $this->page,
-				'with_original_language' => 'en'
-			]
+            'page' => $this->page,
+            'with_original_language' => 'en'
 		]);
 
 		return $this->transformResults(
@@ -155,13 +151,11 @@ final class TmdbApiService implements MediaProviderI
 		$endOfWeek = $date->endOfWeek()->format('Y-m-d');
 
 		$request = $this->http->get('discover/tv', [
-			'query' => [
-				'air_date.gte' => $beginningOfWeek,
-				'air_date.lte' => $endOfWeek,
-				'sort_by' => 'popularity.desc',
-				'with_original_language' => 'en',
-				'timezone' => $timezone
-			]
+            'air_date.gte' => $beginningOfWeek,
+            'air_date.lte' => $endOfWeek,
+            'sort_by' => 'popularity.desc',
+            'with_original_language' => 'en',
+            'timezone' => $timezone
 		]);
 
 		return $this->transformResults(
@@ -176,13 +170,11 @@ final class TmdbApiService implements MediaProviderI
 		$endOfWeek = $date->endOfWeek()->format('Y-m-d');
 
 		$request = $this->http->get('discover/movie', [
-			'query' => [
-				'air_date.gte' => $beginningOfWeek,
-				'air_date.lte' => $endOfWeek,
-				'sort_by' => 'popularity.desc',
-				'with_original_language' => 'en',
-				'timezone' => $timezone
-			]
+            'air_date.gte' => $beginningOfWeek,
+            'air_date.lte' => $endOfWeek,
+            'sort_by' => 'popularity.desc',
+            'with_original_language' => 'en',
+            'timezone' => $timezone
 		]);
 
 		return $this->transformResults(
@@ -202,7 +194,7 @@ final class TmdbApiService implements MediaProviderI
      * Get details about a movie
      * @param int $id
      * @return MovieDetail
-     * @throws Exception|GuzzleException
+     * @throws Exception
 	 */
     public function getMovieDetails(int $id): MovieDetail
     {
@@ -212,11 +204,8 @@ final class TmdbApiService implements MediaProviderI
 			]
 		]);
 
-        $response = json_decode($request->getBody()
-			->getContents(), true);
-
 		return $this->transformer
-			->transform($response)
+			->transform($request->json())
 			->to('movie');
     }
 
@@ -232,54 +221,43 @@ final class TmdbApiService implements MediaProviderI
 
 	public function getRelated(string $type, int $id): array
 	{
+        $type = match ($type) {
+            'movie' => 'movie',
+            default => 'tv'
+        };
+
 		$request = $this->http->get($type .'/'. $id .'/recommendations', [
-			'query' => [
-				'language' => 'en-US'
-			]
+            'language' => 'en-US'
 		]);
 
-		$response = json_decode($request->getBody()
-			->getContents(), true);
-
-		$related = [];
-		foreach ($response['results'] as $result) {
-			$related[] = $this->transformer
-				->transform($result)
-				->to($type.'Summary');
-		}
-
-		return $related;
+        return $this->transformResults(
+            $request->json()['results'],
+            $type === 'movie' ? 'movieSummary' : 'tvSummary'
+        );
 	}
 
-    public function getShowDetails(int $id): ShowDetail
+    public function getShowDetails(int $id): TvShowDetail
     {
 		$request = $this->http->get('tv/'.$id, [
-			'query' => [
-				'append_to_response' => 'videos'
-			]
+            'append_to_response' => 'videos'
 		]);
 
-        $response = json_decode($request->getBody()
-			->getContents(), true);
-
 		return $this->transformer
-			->transform($response)
+			->transform($request->json())
 			->to('tv');
     }
 
-	public function getSeason(int $id, int $number): TvSeason
+    /**
+     * @throws ConnectionException
+     */
+    public function getSeason(int $id, int $number): TvSeason
 	{
 		$request = $this->http->get("tv/$id/season/$number", [
-			'query' => [
-				'append_to_response' => 'videos'
-			]
+            'append_to_response' => 'videos'
 		]);
 
-		$response = json_decode($request->getBody()
-			->getContents(), true);
-
 		return $this->transformer
-			->transform($response)
+			->transform($request->json())
 			->to('season');
 	}
 
@@ -291,9 +269,7 @@ final class TmdbApiService implements MediaProviderI
         };
 
 		$request = $this->http->get('search/'.$type, [
-			'query' => [
-				'query' => $query
-			]
+            'query' => $query
 		]);
 
         $response = json_decode($request->getBody()->getContents(), true);
@@ -318,8 +294,7 @@ final class TmdbApiService implements MediaProviderI
 	{
 		return array_map(
 			fn ($result) => $this->transformer
-				->transform($result)
-				->to($type),
+				->transform($result)->to($type),
 			$data
 		);
 	}

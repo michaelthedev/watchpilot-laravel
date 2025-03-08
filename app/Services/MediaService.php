@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\DTO\MovieDetail;
+use App\DTO\TvSeason;
+use App\DTO\TvShowDetail;
 use App\Interfaces\Providers\MediaProviderI;
 use App\Services\Providers\Media\Tmdb\TmdbApiService;
 
@@ -39,7 +42,7 @@ final class MediaService
 
         try {
             return cache()->remember('discover.trending.' . $type, $expiry,
-                function() use ($type) {
+                function () use ($type) {
                     return $this->getProvider()->getTrending($type);
                 }
             );
@@ -50,14 +53,14 @@ final class MediaService
         }
     }
 
-    public function airing(?string $type = null, string $timezone = 'UTC'): array
+    public function getAiring(?string $type = null, string $timezone = 'UTC'): array
     {
         $type = $type ?? 'all';
         $expiry = now()->addHours(12);
 
         try {
             return cache()->remember('discover.airing.' . $type, $expiry,
-                function() use ($type, $timezone) {
+                function () use ($type, $timezone) {
                     return $this->getProvider()->getAiring($timezone);
                 }
             );
@@ -74,8 +77,8 @@ final class MediaService
         $expiry = now()->startOfDay()->addDay();
 
         try {
-            return cache()->remember('discover.featured.'.$type, $expiry,
-                function() use ($type) {
+            return cache()->remember('discover.featured.' . $type, $expiry,
+                function () use ($type) {
                     return $this->getProvider()->getFeatured($type);
                 }
             );
@@ -84,6 +87,57 @@ final class MediaService
                 ->error('Featured error: ' . $e->getMessage());
             return [];
         }
+    }
+
+    public function getShowDetails(int $id): ?TvShowDetail
+    {
+        try {
+            return $this->getProvider()->getShowDetails($id);
+        } catch (\Exception $e) {
+            logger()->channel('media')
+                ->error('Tv show details error: ' . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    public function getMovieDetails(int $id): ?MovieDetail
+    {
+        try {
+            return $this->getProvider()->getMovieDetails($id);
+        } catch (\Exception $e) {
+            logger()->channel('media')
+                ->error('Movie details error: ' . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    public function getRelated(string $type, int $id): array
+    {
+        try {
+            return $this->getProvider()->getRelated($type, $id);
+        } catch (\Exception $e) {
+            logger()->channel('media')
+                ->error('Related error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getSeason(int $media_id, int $number): ?TvSeason
+    {
+        try {
+            return $this->getProvider()->getSeason($media_id, $number);
+        } catch (\Exception $e) {
+            logger()->channel('media')
+                ->error('Seasons error: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function getWatchProviders(string $type, int $id): array
+    {
+
     }
 
     private function getProvider(): MediaProviderI

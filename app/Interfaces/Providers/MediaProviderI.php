@@ -3,7 +3,8 @@
 namespace App\Interfaces\Providers;
 
 use App\DTO\MovieDetail;
-use App\DTO\ShowDetail;
+use App\DTO\TvSeason;
+use App\DTO\TvShowDetail;
 
 interface MediaProviderI
 {
@@ -17,7 +18,11 @@ interface MediaProviderI
 
     public function getMovieDetails(int $id): MovieDetail;
 
-    public function getShowDetails(int $id): ShowDetail;
+    public function getShowDetails(int $id): TvShowDetail;
+
+    public function getRelated(string $type, int $id): array;
+
+    public function getSeason(int $id, int $number): TvSeason;
 
 	public function getWatchProviders(string $type, int $id): array;
 
