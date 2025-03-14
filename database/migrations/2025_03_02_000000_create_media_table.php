@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('media', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('media_id')
+            $table->unsignedBigInteger('tmdb_id')
                 ->comment('The ID of the media from provider');
             $table->enum('type', ['movie', 'tv-show']);
             $table->string('title');

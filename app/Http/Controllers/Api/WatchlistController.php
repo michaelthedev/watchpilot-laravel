@@ -150,7 +150,7 @@ final class WatchlistController extends BaseController
         // Find or create media record using provided details
         $media = Media::updateOrCreate(
             [
-                'media_id' => $validated['media_id'],
+                'tmdb_id' => $validated['media_id'],
                 'type' => $validated['type'],
             ],
             [
@@ -192,7 +192,7 @@ final class WatchlistController extends BaseController
         }
 
         // get media
-        $media = Media::where('media_id', $request->media_id)
+        $media = Media::whereTmdbId($request->media_id)
             ->where('type', $request->type)
             ->firstOrFail();
 
