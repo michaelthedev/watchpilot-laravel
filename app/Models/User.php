@@ -37,14 +37,24 @@ final class User extends Authenticatable
         return $this->hasMany(Watchlist::class);
     }
 
-    public function likes(): HasMany
+    public function reminders(): HasMany
     {
         return $this->hasMany(MediaLike::class);
+    public function likedMedia(): BelongsToMany
+    {
+        return $this->belongsToMany(Media::class, 'user_likes')
+            ->withTimestamps();
     }
 
     public function library(): HasMany
     {
         return $this->hasMany(UserLibrary::class);
+    }
+
+    // Check if user has liked a specific media
+    public function hasLiked(Media $media): bool
+    {
+        return $this->likedMedia()->where('media_id', $media->id)->exists();
     }
 
     public function getJWTIdentifier(): mixed

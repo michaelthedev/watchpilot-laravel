@@ -28,7 +28,6 @@ Route::group(['prefix' => '/discover'], function() {
 
 
 Route::middleware('auth:api')->group(function() {
-    Route::apiResource('watchlist', WatchlistController::class);
     Route::group(['prefix' => '/watchlist'], function() {
         Route::get('/', [WatchlistController::class, 'index']);
         Route::post('/', [WatchlistController::class, 'store']);
@@ -44,8 +43,7 @@ Route::middleware('auth:api')->group(function() {
 
     Route::group(['prefix' => '/library'], function() {
         Route::get('/likes', [LibraryController::class, 'likes']);
-        Route::post('/likes', [LibraryController::class, 'addLike']);
-        Route::delete('/likes', [LibraryController::class, 'deleteLike']);
+        Route::patch('/likes', [LibraryController::class, 'toggleLike']);
 
         // watching
         Route::get('/watching', [LibraryController::class, 'watching']);
