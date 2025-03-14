@@ -35,6 +35,8 @@ final class LoginController extends BaseController
 
     private function buildJWTData(string $token): array
     {
+        // set custom ttl
+        JWTAuth::factory()->setTTL(60 * 24 * 7);
         return [
             'token' => $token,
             'type' => 'bearer',
