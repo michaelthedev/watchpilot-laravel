@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -39,7 +40,9 @@ final class User extends Authenticatable
 
     public function reminders(): HasMany
     {
-        return $this->hasMany(MediaLike::class);
+        return $this->hasMany(UserReminders::class);
+    }
+
     public function likedMedia(): BelongsToMany
     {
         return $this->belongsToMany(Media::class, 'user_likes')
