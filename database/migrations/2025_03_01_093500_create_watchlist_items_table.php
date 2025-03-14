@@ -14,14 +14,13 @@ return new class extends Migration
         Schema::create('watchlist_items', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('watchlist_id')
-                ->constrained()->onDelete('cascade');
-            $table->string('title');
-            $table->string('item_id');
-            $table->string('type');
-            $table->string('poster')->nullable();
-
+            $table->foreignId('watchlist_id')->constrained()->onDelete('cascade');
+            $table->foreignId('media_id')->constrained()->onDelete('cascade');
+            $table->timestamp('added_at')->useCurrent();
             $table->timestamps();
+
+            // Prevent duplicate items in the same watchlist
+            $table->unique(['watchlist_id', 'media_id']);
         });
     }
 

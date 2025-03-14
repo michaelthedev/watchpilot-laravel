@@ -14,7 +14,7 @@ Route::get('/status', function () {
 });
 
 Route::group(['prefix' => '/auth'], function() {
-   Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/login', [LoginController::class, 'login']);
 
     Route::post('/register', [RegisterController::class, 'register']);
 });
@@ -26,19 +26,20 @@ Route::group(['prefix' => '/discover'], function() {
    Route::get('/featured/{type?}', [DiscoverController::class, 'featured']);
 });
 
-Route::group(['prefix' => '{type}'], function() {
-    Route::get('/{id}', [MediaController::class, 'show']);
-    Route::get('/{id}/related', [MediaController::class, 'related']);
-    Route::get('/{id}/seasons/{number}', [MediaController::class, 'seasons']);
-    Route::get('/{id}/providers', [MediaController::class, 'providers']);
-})->where(['type' => '(movie|tv-show)']);
 
 Route::middleware('auth:api')->group(function() {
     Route::apiResource('watchlist', WatchlistController::class);
     Route::group(['prefix' => '/watchlist'], function() {
-        Route::get('/{uid}/item', [WatchlistController::class, 'items']);
-        Route::post('/{uid}/item', [WatchlistController::class, 'addItem']);
-        Route::delete('/{uid}/item', [WatchlistController::class, 'deleteItem']);
+        Route::get('/', [WatchlistController::class, 'index']);
+        Route::post('/', [WatchlistController::class, 'store']);
+
+        Route::get('/{uid}', [WatchlistController::class, 'show']);
+        Route::patch('/{uid}', [WatchlistController::class, 'update']);
+        Route::delete('/{uid}', [WatchlistController::class, 'destroy']);
+
+        Route::get('/{uid}/items', [WatchlistController::class, 'items']);
+        Route::post('/{uid}/items', [WatchlistController::class, 'addItem']);
+        Route::delete('/{uid}/items', [WatchlistController::class, 'removeItem']);
     });
 
     Route::group(['prefix' => '/library'], function() {
@@ -55,6 +56,16 @@ Route::middleware('auth:api')->group(function() {
     });
 });
 
+
+Route::group([
+    'prefix' => '{type}',
+    'controller' => MediaController::class
+], function() {
+    Route::get('/{id}', 'show');
+    Route::get('/{id}/related', 'related');
+    Route::get('/{id}/providers', 'providers');
+    Route::get('/{id}/seasons/{number}', 'seasons');
+})->where(['type' => '^(movie|tv-show)$']);
 
 Route::group(['prefix' => '/misc'], function() {
     Route::get('/timezones', [MiscController::class, 'timezones']);

@@ -15,10 +15,12 @@ return new class extends Migration
             $table->id();
 
             $table->string('uid')->unique();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()
+                ->cascadeOnDelete();
 
             $table->string('name');
             $table->string('visibility');
+            $table->integer('views')->default(0);
 
             $table->timestamps();
         });

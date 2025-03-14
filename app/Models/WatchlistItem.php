@@ -13,4 +13,9 @@ final class WatchlistItem extends Model
     {
         return $this->belongsTo(Watchlist::class);
     }
+
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(Media::class);
+    }
 }
