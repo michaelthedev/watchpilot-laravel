@@ -178,7 +178,7 @@ final class TmdbApiService implements MediaProviderI
 		]);
 
 		return $this->transformResults(
-			$request->json()['results'], 'movieSummary'
+			$request->json('results'), 'movieSummary'
 		);
     }
 
@@ -209,29 +209,41 @@ final class TmdbApiService implements MediaProviderI
 			->to('movie');
     }
 
-	public function getWatchProviders(string $type, int $id): array
+    /**
+     * @throws ConnectionException
+     */
+    public function getWatchProviders(string $type, int $id, ?string $region = null): array
 	{
-		// $request = $this->client->get($type .'/'. $id .'/watch/providers');
+        if ($type == 'tv-show') $type = 'tv';
 
-		// $response = json_decode($request->getBody()
-			// ->getContents(), true);
+		$request = $this->http->get("$type/$id/watch/providers", [
+            'watch_region' => $region
+        ]);
+
+        $this->transformResults(
+            $request->json('results'), 'watchProviders'
+        );
+        dd($request->json());
 
 		return [];
 	}
 
-	public function getRelated(string $type, int $id): array
+    /**
+     * @throws ConnectionException
+     */
+    public function getRelated(string $type, int $id): array
 	{
         $type = match ($type) {
             'movie' => 'movie',
             default => 'tv'
         };
 
-		$request = $this->http->get($type .'/'. $id .'/recommendations', [
+		$request = $this->http->get("$type/$id/recommendations", [
             'language' => 'en-US'
 		]);
 
         return $this->transformResults(
-            $request->json()['results'],
+            $request->json('results'),
             $type === 'movie' ? 'movieSummary' : 'tvSummary'
         );
 	}

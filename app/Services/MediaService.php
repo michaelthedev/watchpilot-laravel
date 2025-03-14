@@ -9,6 +9,7 @@ use App\DTO\TvSeason;
 use App\DTO\TvShowDetail;
 use App\Interfaces\Providers\MediaProviderI;
 use App\Services\Providers\Media\Tmdb\TmdbApiService;
+use Illuminate\Http\Request;
 
 final class MediaService
 {
@@ -92,7 +93,12 @@ final class MediaService
     public function getShowDetails(int $id): ?TvShowDetail
     {
         try {
-            return $this->getProvider()->getShowDetails($id);
+            $key = "media.tv.$id";
+            $expiry = now()->addHour();
+
+            return cache()->remember($key, $expiry, function() use($id) {
+                return $this->getProvider()->getShowDetails($id);
+            });
         } catch (\Exception $e) {
             logger()->channel('media')
                 ->error('Tv show details error: ' . $e->getMessage());
@@ -104,7 +110,12 @@ final class MediaService
     public function getMovieDetails(int $id): ?MovieDetail
     {
         try {
-            return $this->getProvider()->getMovieDetails($id);
+            $key = "media.movie.$id";
+            $expiry = now()->addHour();
+
+            return cache()->remember($key, $expiry, function() use($id) {
+                return $this->getProvider()->getMovieDetails($id);
+            });
         } catch (\Exception $e) {
             logger()->channel('media')
                 ->error('Movie details error: ' . $e->getMessage());
