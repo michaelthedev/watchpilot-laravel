@@ -180,11 +180,6 @@ final class TmdbTransformer
 		return 'https://image.tmdb.org/t/p/' .($highRes ? 'original' : 'w500'). $image;
 	}
 
-	private function getTrailer(int $id): ?array
-	{
-		return null;
-	}
-
 	private function findTrailerFromVideos(array $videos): array
 	{
 		$trailers = [];
