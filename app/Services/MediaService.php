@@ -9,7 +9,6 @@ use App\DTO\TvSeason;
 use App\DTO\TvShowDetail;
 use App\Interfaces\Providers\MediaProviderI;
 use App\Services\Providers\Media\Tmdb\TmdbApiService;
-use Illuminate\Http\Request;
 
 final class MediaService
 {
@@ -33,7 +32,7 @@ final class MediaService
     public function search(string $term, ?string $type = null): array
     {
         $type = $type ?? 'all';
-        return [];
+        return $this->getProvider()->search($term, $type);
     }
 
     public function getTrending(?string $type = null): array

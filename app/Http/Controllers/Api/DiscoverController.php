@@ -18,7 +18,7 @@ final class DiscoverController extends BaseController
     {
         return $this->jsonResponse(
             message: 'Search results',
-            data: $this->mediaService->search($request->term, $request->type)
+            data: $this->mediaService->search($request->get('query'), $request->type)
         );
     }
 

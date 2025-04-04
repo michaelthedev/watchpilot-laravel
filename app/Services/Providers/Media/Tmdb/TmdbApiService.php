@@ -78,7 +78,7 @@ final class TmdbApiService implements MediaProviderI
 		]);
 
 		return $this->transformResults(
-			$request->json()['results'], 'movieSummary'
+			$request->json('results'), 'movieSummary'
 		);
     }
 
@@ -94,7 +94,7 @@ final class TmdbApiService implements MediaProviderI
 		]);
 
 		return $this->transformResults(
-			$request->json()['results'], 'tvSummary'
+			$request->json('results'), 'tvSummary'
 		);
     }
 
@@ -128,7 +128,7 @@ final class TmdbApiService implements MediaProviderI
 		]);
 
 		return $this->transformResults(
-			$request->json()['results'], 'movieSummary'
+			$request->json('results'), 'movieSummary'
 		);
     }
 
@@ -140,7 +140,7 @@ final class TmdbApiService implements MediaProviderI
 		]);
 
 		return $this->transformResults(
-			$request->json()['results'], 'tvSummary'
+			$request->json('results'), 'tvSummary'
 		);
     }
 
@@ -159,7 +159,7 @@ final class TmdbApiService implements MediaProviderI
 		]);
 
 		return $this->transformResults(
-			$request->json()['results'], 'tvSummary'
+			$request->json('results'), 'tvSummary'
 		);
     }
 
@@ -281,25 +281,23 @@ final class TmdbApiService implements MediaProviderI
         };
 
 		$request = $this->http->get('search/'.$type, [
-            'query' => $query
+            'query' => $query,
+            'language' => 'en-Us',
+            'page' => $this->page,
+            'include_adult' => false
 		]);
 
-        $response = json_decode($request->getBody()->getContents(), true);
-        $results = [];
-        foreach ($response['results'] as $result) {
-            if (empty($result['poster_path'])) continue;
-            $results[] = [
-                'id' => $result['id'],
-                'type' => $result['media_type'] ?? $type,
-                'title' => $result['title'] ?? $result['name'],
-                'overview' => substr($result['overview'], 30),
-                'rating' => $result['vote_average'],
-                // 'imageUrl' => $this->formatImageUrl($result['poster_path']),
-                'releaseYear' =>  date('Y', strtotime($result['release_date'] ?? $result['first_air_date']))
-            ];
-        }
+        $data = $request->collect('results')
+            // filter where media type is movie or tv and backdrops exist
+            ->filter(fn ($result) => in_array($result['media_type'], ['movie', 'tv']))
+            ->filter(fn ($result) => !empty($result['backdrop_path']))
+            ->sortByDesc('popularity')
+            ->values()->all();
 
-        return $results;
+        return $this->transformResults(
+            $data,
+            "searchResult"
+        );
     }
 
 	private function transformResults(array $data, string $type): array

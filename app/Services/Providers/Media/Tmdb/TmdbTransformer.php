@@ -32,6 +32,8 @@ final class TmdbTransformer
 			'season' => $this->transformSeason($this->data),
 			'movieSummary' => $this->transformMovieSummary($this->data),
 			'tvSummary' => $this->transformTvSummary($this->data),
+            'searchResult' => $this->transformSearchResult($this->data),
+            // 'watchProvider' => $this->transform(),
 			default => throw new Exception('Invalid type')
 		};
 	}
@@ -126,6 +128,24 @@ final class TmdbTransformer
 			releaseDate: $data['air_date'],
 		);
 	}
+
+    private function transformSearchResult(array $data): array
+    {
+        $type = match ($data['media_type']) {
+            'tv' => 'tv-show',
+            default => 'movie',
+        };
+
+        return [
+            'id' => $data['id'],
+            'type' => $type,
+            'title' => $data['title'] ?? $data['name'],
+            'overview' => $data['overview'],
+            'rating' => round($data['vote_average'], 1),
+            'imageUrl' => $this->formatImageUrl($data['poster_path']),
+            'releaseYear' =>  date('Y', strtotime($data['release_date'] ?? $data['first_air_date']))
+        ];
+    }
 
 	private function getSeasons(array $seasons): array
 	{

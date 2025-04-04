@@ -20,12 +20,12 @@ Route::group(['prefix' => '/auth'], function() {
 });
 
 Route::group(['prefix' => '/discover'], function() {
-   Route::get('/search', [DiscoverController::class, 'search']);
    Route::get('/airing/{type?}', [DiscoverController::class, 'airing']);
    Route::get('/trending/{type?}', [DiscoverController::class, 'trending']);
    Route::get('/featured/{type?}', [DiscoverController::class, 'featured']);
 });
 
+Route::get('/search/{type?}', [DiscoverController::class, 'search']);
 
 Route::middleware('auth:api')->group(function() {
     Route::group(['prefix' => '/watchlist'], function() {
