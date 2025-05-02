@@ -31,13 +31,13 @@ final class MediaService
 
     public function search(string $term, ?string $type = null): array
     {
-        $type = $type ?? 'all';
+        $type ??= 'all';
         return $this->getProvider()->search($term, $type);
     }
 
     public function getTrending(?string $type = null): array
     {
-        $type = $type ?? 'all';
+        $type ??= 'all';
         $expiry = now()->addHours(6);
 
         try {
@@ -55,7 +55,7 @@ final class MediaService
 
     public function getAiring(?string $type = null, string $timezone = 'UTC'): array
     {
-        $type = $type ?? 'all';
+        $type ??= 'all';
         $expiry = now()->addHours(12);
 
         try {
@@ -73,7 +73,7 @@ final class MediaService
 
     public function getFeatured(?string $type = null): array
     {
-        $type = $type ?? 'all';
+        $type ??= 'all';
         $expiry = now()->startOfDay()->addDay();
 
         try {

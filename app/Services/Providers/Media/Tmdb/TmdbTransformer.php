@@ -142,8 +142,8 @@ final class TmdbTransformer
             'title' => $data['title'] ?? $data['name'],
             'overview' => $data['overview'],
             'rating' => round($data['vote_average'], 1),
-            'imageUrl' => $this->formatImageUrl($data['poster_path']),
-            'releaseYear' =>  date('Y', strtotime($data['release_date'] ?? $data['first_air_date']))
+            'imageUrl' => $this->formatImageUrl($data['poster_path'] ?? $data['backdrop_path']),
+            'releaseYear' => $date ? date('Y', strtotime($date)) : '0000'
         ];
     }
 
@@ -196,7 +196,8 @@ final class TmdbTransformer
 
 	public function formatImageUrl(?string $image, bool $highRes = false): ?string
 	{
-		if (empty($image)) return null;
+		if (empty($image)) return asset('assets/images/dummy-img.png');
+
 		return 'https://image.tmdb.org/t/p/' .($highRes ? 'original' : 'w500'). $image;
 	}
 

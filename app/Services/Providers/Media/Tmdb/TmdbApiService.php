@@ -17,8 +17,8 @@ use Illuminate\Support\Facades\Http;
 
 final class TmdbApiService implements MediaProviderI
 {
-	private PendingRequest $http;
 	private int $page = 1;
+	private PendingRequest $http;
 
 	public function __construct(
         private readonly TmdbTransformer $transformer

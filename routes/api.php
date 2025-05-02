@@ -15,7 +15,6 @@ Route::get('/status', function () {
 
 Route::group(['prefix' => '/auth'], function() {
     Route::post('/login', [LoginController::class, 'login']);
-
     Route::post('/register', [RegisterController::class, 'register']);
 });
 
@@ -62,6 +61,7 @@ Route::group([
     Route::get('/{id}', 'show');
     Route::get('/{id}/related', 'related');
     Route::get('/{id}/providers', 'providers');
+
     Route::get('/{id}/seasons/{number}', 'seasons');
 })->where(['type' => '^(movie|tv-show)$']);
 

@@ -194,9 +194,9 @@ final class WatchlistController extends BaseController
         // get media
         $media = Media::whereTmdbId($request->media_id)
             ->where('type', $request->type)
-            ->firstOrFail();
+            ->first();
 
-        $watchlist->media()->detach($media->id);
+        $media && $watchlist->media()->detach($media->id);
 
         return $this->jsonResponse(
             message: 'Item removed from watchlist'
