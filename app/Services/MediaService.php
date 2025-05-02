@@ -38,12 +38,16 @@ final class MediaService
     public function getTrending(?string $type = null): array
     {
         $type ??= 'all';
+        $page = (int) request()->input('page', 1);
+        $cacheKey = "discover.trending.$type.p_$page";
         $expiry = now()->addHours(6);
 
         try {
-            return cache()->remember('discover.trending.' . $type, $expiry,
-                function () use ($type) {
-                    return $this->getProvider()->getTrending($type);
+            return cache()->remember($cacheKey, $expiry,
+                function () use ($type, $page) {
+                    return $this->getProvider()
+                        ->setPage($page)
+                        ->getTrending($type);
                 }
             );
         } catch (\Exception $e) {
