@@ -149,9 +149,16 @@ final class MediaService
         }
     }
 
-    public function getWatchProviders(string $type, int $id): array
+    public function getWatchProviders(string $type, int $id, ?string $region = null): array
     {
+        try {
+            return $this->getProvider()->getWatchProviders($type, $id, $region);
+        } catch (\Exception $e) {
+            logger()->channel('media')
+                ->error('watch provider error: ' . $e->getMessage());
 
+            return [];
+        }
     }
 
     private function getProvider(): MediaProviderI
