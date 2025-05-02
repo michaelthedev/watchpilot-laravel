@@ -28,6 +28,16 @@ final class MediaController extends BaseController
         );
     }
 
+    public function reviews(string $type, int $id): JsonResponse
+    {
+        $result = $this->service->getReviews($type, $id);
+
+        return $this->jsonResponse(
+            message: 'media reviews',
+            data: $result
+        );
+    }
+
     public function related(string $type, int $id): JsonResponse
     {
         $result = $this->service->getRelated($type, $id);

@@ -10,6 +10,7 @@ use App\DTO\TvEpisode;
 use App\DTO\TvSeason;
 use DateTimeImmutable;
 use Exception;
+use Illuminate\Support\Str;
 
 final class TmdbTransformer
 {
@@ -34,6 +35,7 @@ final class TmdbTransformer
 			'tvSummary' => $this->transformTvSummary($this->data),
             'searchResult' => $this->transformSearchResult($this->data, $option),
             // 'watchProvider' => $this->transform(),
+            'review' => $this->transformReview($this->data),
 			default => throw new Exception('Invalid type')
 		};
 	}
@@ -146,6 +148,19 @@ final class TmdbTransformer
             'rating' => round($data['vote_average'], 1),
             'imageUrl' => $this->formatImageUrl($data['poster_path'] ?? $data['backdrop_path']),
             'releaseYear' => $date ? date('Y', strtotime($date)) : '0000'
+        ];
+    }
+
+    private function transformReview(array $data): array
+    {
+        return [
+            // 'id' => $data['id'],
+            // 'url' => $data['url'],
+            'source' => 'provider',
+            'author' => $data['author'],
+            'summary' => Str::limit($data['content'], 200),
+            'content' => $data['content'],
+            'date' => $data['updated_at'],
         ];
     }
 

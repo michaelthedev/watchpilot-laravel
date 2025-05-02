@@ -138,6 +138,18 @@ final class MediaService
         }
     }
 
+    public function getReviews(string $type, int $id): array
+    {
+        try {
+            //@todo: cache provider reviews and include database reviews
+            return $this->getProvider()->getReviews($type, $id);
+        } catch (\Exception $e) {
+            logger()->channel('media')
+                ->error('Reviews error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function getSeason(int $media_id, int $number): ?TvSeason
     {
         try {

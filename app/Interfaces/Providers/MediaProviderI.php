@@ -20,6 +20,8 @@ interface MediaProviderI
 
     public function getShowDetails(int $id): TvShowDetail;
 
+    public function getReviews(string $type, int $id): array;
+
     public function getRelated(string $type, int $id): array;
 
     public function getSeason(int $id, int $number): TvSeason;

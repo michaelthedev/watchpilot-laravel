@@ -59,6 +59,7 @@ Route::group([
     'controller' => MediaController::class
 ], function() {
     Route::get('/{id}', 'show');
+    Route::get('/{id}/reviews', 'reviews');
     Route::get('/{id}/related', 'related');
     Route::get('/{id}/providers', 'providers');
 

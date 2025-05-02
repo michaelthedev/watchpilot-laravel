@@ -248,6 +248,26 @@ final class TmdbApiService implements MediaProviderI
         );
 	}
 
+    /**
+     * @throws ConnectionException
+     */
+    public function getReviews(string $type, int $id): array
+	{
+        $type = match ($type) {
+            'movie' => 'movie',
+            default => 'tv'
+        };
+
+		$request = $this->http->get("$type/$id/reviews", [
+            'language' => 'en-US'
+		]);
+
+        return $this->transformResults(
+            $request->json('results'),
+            'review'
+        );
+	}
+
     public function getShowDetails(int $id): TvShowDetail
     {
 		$request = $this->http->get('tv/'.$id, [
