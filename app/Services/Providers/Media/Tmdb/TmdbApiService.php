@@ -170,8 +170,8 @@ final class TmdbApiService implements MediaProviderI
 		$endOfWeek = $date->endOfWeek()->format('Y-m-d');
 
 		$request = $this->http->get('discover/movie', [
-            'air_date.gte' => $beginningOfWeek,
-            'air_date.lte' => $endOfWeek,
+            'primary_release_date.gte' => $beginningOfWeek,
+            'primary_release_date.lte' => $endOfWeek,
             'sort_by' => 'popularity.desc',
             'with_original_language' => 'en',
             'timezone' => $timezone
