@@ -24,7 +24,7 @@ interface MediaProviderI
 
     public function getSeason(int $id, int $number): TvSeason;
 
-	public function getWatchProviders(string $type, int $id): array;
+	public function getWatchProviders(string $type, int $id, ?string $region = null): array;
 
     /**
      * @param string $query What to search for

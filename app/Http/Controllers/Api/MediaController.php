@@ -38,9 +38,9 @@ final class MediaController extends BaseController
         );
     }
 
-    public function providers(string $type, int $id): JsonResponse
+    public function providers(Request $request, string $type, int $id): JsonResponse
     {
-        $result = $this->service->getProviders($type, $id);
+        $result = $this->service->getWatchProviders($type, $id, $request->region);
 
         return $this->jsonResponse(
             message: 'providers',
