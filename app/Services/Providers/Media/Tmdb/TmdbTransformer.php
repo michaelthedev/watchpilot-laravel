@@ -24,7 +24,7 @@ final class TmdbTransformer
     /**
      * @throws Exception
      */
-    public function to(string $type): MovieDetail|array|TvShowDetail|TvSeason
+    public function to(string $type, ?string $option = null): MovieDetail|array|TvShowDetail|TvSeason
 	{
 		return match ($type) {
 			'movie' => $this->transformMovie($this->data),
@@ -32,7 +32,7 @@ final class TmdbTransformer
 			'season' => $this->transformSeason($this->data),
 			'movieSummary' => $this->transformMovieSummary($this->data),
 			'tvSummary' => $this->transformTvSummary($this->data),
-            'searchResult' => $this->transformSearchResult($this->data),
+            'searchResult' => $this->transformSearchResult($this->data, $option),
             // 'watchProvider' => $this->transform(),
 			default => throw new Exception('Invalid type')
 		};
@@ -129,12 +129,14 @@ final class TmdbTransformer
 		);
 	}
 
-    private function transformSearchResult(array $data): array
+    private function transformSearchResult(array $data, ?string $option = null): array
     {
-        $type = match ($data['media_type']) {
+        $type = match ($data['media_type'] ?? $option) {
             'tv' => 'tv-show',
             default => 'movie',
         };
+
+        $date = $data['release_date'] ?? $data['first_air_date'] ?? null;
 
         return [
             'id' => $data['id'],

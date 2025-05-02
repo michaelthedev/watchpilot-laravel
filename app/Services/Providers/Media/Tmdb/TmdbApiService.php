@@ -277,6 +277,7 @@ final class TmdbApiService implements MediaProviderI
     {
         $type = match ($type) {
             'all' => 'multi',
+            'tv-show' => 'tv',
             default => $type,
         };
 
@@ -289,22 +290,21 @@ final class TmdbApiService implements MediaProviderI
 
         $data = $request->collect('results')
             // filter where media type is movie or tv and backdrops exist
-            ->filter(fn ($result) => in_array($result['media_type'], ['movie', 'tv']))
-            ->filter(fn ($result) => !empty($result['backdrop_path']))
+            ->when($type === 'multi', function ($collection) {
+                return $collection->filter(fn ($result) => in_array($result['media_type'], ['movie', 'tv']));
+            })
+            ->filter(fn ($result) => !empty($result['backdrop_path']) || !empty($result['poster_path']))
             ->sortByDesc('popularity')
             ->values()->all();
 
-        return $this->transformResults(
-            $data,
-            "searchResult"
-        );
+        return $this->transformResults($data, "searchResult", $type);
     }
 
-	private function transformResults(array $data, string $type): array
+	private function transformResults(array $data, string $type, ?string $option = null): array
 	{
 		return array_map(
 			fn ($result) => $this->transformer
-				->transform($result)->to($type),
+				->transform($result)->to($type, $option),
 			$data
 		);
 	}
