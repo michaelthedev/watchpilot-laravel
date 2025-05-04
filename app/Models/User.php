@@ -54,6 +54,11 @@ final class User extends Authenticatable
         return $this->hasMany(UserLibrary::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     // Check if user has liked a specific media
     public function hasLiked(Media $media): bool
     {
