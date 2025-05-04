@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Media;
+use App\Rules\MediaRule;
 use App\Services\MediaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,6 +37,44 @@ final class MediaController extends BaseController
         return $this->jsonResponse(
             message: 'media reviews',
             data: $result
+        );
+    }
+
+    public function addReview(Request $request, string $type, int $id): JsonResponse
+    {
+        $user = $this->getUser();
+        if (! $user) {
+           return $this->jsonResponse(
+                message: 'You must be logged in to add a review',
+                status: 401
+            );
+        }
+
+        $validated = $request->validate([
+            'media' => ['required', 'array', new MediaRule()],
+            'content' => ['required', 'string', 'min:30'],
+        ]);
+
+        // Find or create media record using provided details
+        $media = Media::upsertItem($validated['media']);
+
+        // Check if the user has already reviewed this media
+        if ($user->reviews()->where('media_id', $media->id)->exists()) {
+            return $this->jsonResponse(
+                message: 'You already have a review for this media',
+                status: 400
+            );
+        }
+
+        $user->reviews()->create([
+            'media_id' => $media->id,
+            'content' => $validated['content'],
+            'rating' => $request->rating ?? 0
+        ]);
+
+        return $this->jsonResponse(
+            status: 201,
+            message: 'Review submitted',
         );
     }
 

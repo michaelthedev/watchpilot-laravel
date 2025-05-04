@@ -51,4 +51,21 @@ final class Media extends Model
     {
         return $this->hasMany(UserReminders::class);
     }
+
+    // function to update or create media record
+    public static function upsertItem(array $data): Media
+    {
+        return self::updateOrCreate(
+            [
+                'tmdb_id' => $data['_id'],
+                'type' => $data['type'],
+            ],
+            [
+                'title' => $data['title'],
+                'poster' => $data['poster'],
+                'release_date' => $data['release_date'] ?? null,
+                'last_synced_at' => now(),
+            ]
+        );
+    }
 }
