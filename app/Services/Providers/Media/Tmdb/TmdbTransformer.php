@@ -156,11 +156,9 @@ final class TmdbTransformer
     private function transformReview(array $data): array
     {
         return [
-            // 'id' => $data['id'],
-            // 'url' => $data['url'],
             'source' => 'provider',
             'author' => $data['author'],
-            'summary' => Str::limit($data['content'], 200),
+            'summary' => strip_tags(Str::limit($data['content'], 200)),
             'content' => $data['content'],
             'date' => $data['updated_at'],
         ];
@@ -206,6 +204,11 @@ final class TmdbTransformer
 			releaseDate: $episode['air_date'],
 		);
 	}
+
+    private function formatWatchProvider(array $data): array
+    {
+        return [];
+    }
 
 	private function formatReleaseDate(string $releaseDate, string $format = 'Y'): string
 	{
