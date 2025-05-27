@@ -19,7 +19,7 @@ final class TvEpisode
         public ?string $imageUrl,
         public int $season,
         public int $episode,
-        public string $releaseDate,
+        public ?string $releaseDate,
         public ?int $runtime = 0,
     )
     {

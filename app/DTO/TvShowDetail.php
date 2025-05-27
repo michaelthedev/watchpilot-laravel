@@ -16,6 +16,7 @@ final class TvShowDetail extends BaseDTO
 	public function __construct(
         public int $id,
         public string $title,
+        public ?string $imdb_id,
         public string $overview,
         public array $seasons,
         public float $rating,

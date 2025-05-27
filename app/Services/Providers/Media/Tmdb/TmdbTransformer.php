@@ -45,6 +45,7 @@ final class TmdbTransformer
 		return new MovieDetail(
 			id: $data['id'],
 			title: $data['title'],
+            imdb_id: $data['imdb_id'],
 			genres: $data['genres'],
 			rating: $data['vote_average'],
 			runtime: $data['runtime'],
@@ -76,6 +77,7 @@ final class TmdbTransformer
 		return new TvShowDetail(
 			id: $data['id'],
 			title: $data['name'],
+            imdb_id: $data['external_ids']['imdb_id'] ?? null,
 			genres: $data['genres'],
 			rating: $data['vote_average'],
 			status: $data['status'],

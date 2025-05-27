@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('tmdb_id')
                 ->comment('The ID of the media from provider');
+            $table->unsignedBigInteger('imdb_id');
             $table->enum('type', ['movie', 'tv-show']);
             $table->string('title');
             $table->string('poster')->nullable();

@@ -271,7 +271,7 @@ final class TmdbApiService implements MediaProviderI
     public function getShowDetails(int $id): TvShowDetail
     {
 		$request = $this->http->get('tv/'.$id, [
-            'append_to_response' => 'videos'
+            'append_to_response' => 'videos,external_ids'
 		]);
 
 		return $this->transformer
