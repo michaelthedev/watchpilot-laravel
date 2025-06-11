@@ -10,25 +10,17 @@ use App\DTO\TvSeason;
 use App\Interfaces\Providers\MediaProviderI;
 use Carbon\Carbon;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\PendingRequest;
-use Illuminate\Support\Facades\Http;
 
-final class TmdbApiService implements MediaProviderI
+final class TmdbApiService extends TmdbClient
+    implements MediaProviderI
 {
 	private int $page = 1;
-	private PendingRequest $http;
 
 	public function __construct(
         private readonly TmdbTransformer $transformer
     ) {
-        // set http client with throw on failure
-        $this->http = Http::withHeaders([
-            'Authorization' => 'Bearer '.config('tmdb.api_key'),
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ])->throw()->baseUrl(config('tmdb.base_url').'/');
+        parent::__construct();
     }
 
 	public function getProviderName(): string
