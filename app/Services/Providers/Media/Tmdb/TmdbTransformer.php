@@ -54,7 +54,7 @@ final class TmdbTransformer
 			overview: $data['overview'],
 			imageUrl: $this->formatImageUrl($data['poster_path']),
 			releaseDate: $data['release_date'],
-			backdropUrl: $this->formatImageUrl($data['backdrop_path'], true),
+			backdropUrl: $this->formatImageUrl($data['backdrop_path'], "high"),
 			releaseYear: (int) $this->formatReleaseDate($data['release_date'])
 		);
 	}
@@ -89,7 +89,7 @@ final class TmdbTransformer
 			overview: $data['overview'],
 			imageUrl: $this->formatImageUrl($data['poster_path']),
 			releaseDate: $data['first_air_date'],
-			backdropUrl: $this->formatImageUrl($data['backdrop_path'], true),
+			backdropUrl: $this->formatImageUrl($data['backdrop_path'], "high"),
 			releaseYear: $this->formatReleaseDate($data['first_air_date']),
 			lastEpisode: $this->getEpisodeDto($data['last_episode_to_air']),
 			nextEpisode: $this->getEpisodeDto($data['next_episode_to_air']),
@@ -216,11 +216,17 @@ final class TmdbTransformer
 			->format($format);
 	}
 
-	public function formatImageUrl(?string $image, bool $highRes = false): ?string
+	public function formatImageUrl(?string $image, ?string $res = null): ?string
 	{
 		if (empty($image)) return asset('assets/images/dummy-img.png');
 
-		return 'https://image.tmdb.org/t/p/' .($highRes ? 'original' : 'w500'). $image;
+        $resolution = match($res) {
+            'medium' => 'w1280',
+            'high' => 'original',
+            default => 'w500',
+        };
+
+		return 'https://image.tmdb.org/t/p/' .$resolution. $image;
 	}
 
 	private function findTrailerFromVideos(array $videos): array
