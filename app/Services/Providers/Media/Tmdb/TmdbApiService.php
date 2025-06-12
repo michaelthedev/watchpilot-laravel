@@ -20,6 +20,7 @@ final class TmdbApiService extends TmdbClient
 	public function __construct(
         private readonly TmdbTransformer $transformer
     ) {
+        $this->http = $this->getClient();
         parent::__construct();
     }
 
