@@ -18,7 +18,7 @@ final class TvSeason extends BaseDTO
         public string $overview,
         public float $rating,
         public ?string $imageUrl,
-        public string $releaseDate,
+        public ?string $releaseDate,
         public ?array $episodes = null,
 		public array $trailers = [],
     ) {
