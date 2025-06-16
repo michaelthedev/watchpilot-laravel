@@ -1,0 +1,30 @@
+[
+  {
+    "type": "movie",
+    "slug": "top-rated-movies-2025",
+    "name": "Top Rated Movies 2025",
+    "description": "Highest rated movies released in 2025",
+    "endpoint": "/discover/movie?primary_release_year=2025&sort_by=vote_average.desc&vote_count.gte=100"
+  },
+  {
+    "type": "tv-show",
+    "slug": "top-rated-tv-2025",
+    "name": "Top Rated TV Shows 2025",
+    "description": "Highest rated TV shows released in 2025",
+    "endpoint": "/discover/tv?first_air_date_year=2025&sort_by=vote_average.desc&vote_count.gte=100"
+  },
+  {
+    "type": "tv-show",
+    "slug": "popular-sci-fi-shows",
+    "name": "Popular Sci-Fi TV Shows",
+    "description": "Top science fiction television series",
+    "endpoint": "/discover/tv?sort_by=vote_average.desc&vote_count.gte=100&with_genres=10765&with_original_language=en"
+  },
+  {
+    "type": "movie",
+    "slug": "popular-netflix-movies-2025",
+    "name": "Popular Netflix Movies 2025",
+    "description": "Most popular movies on Netflix in 2025",
+    "endpoint": "/discover/movie?with_networks=213&sort_by=popularity.desc&primary_release_year=2025"
+  }
+]

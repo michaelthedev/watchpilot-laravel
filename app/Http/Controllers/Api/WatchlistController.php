@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Models\Media;
+use App\Models\SystemList;
 use App\Models\Watchlist;
+use App\Services\SystemListService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -98,7 +100,7 @@ final class WatchlistController extends BaseController
             );
         }
 
-       $watchlist->update($validated);
+        $watchlist->update($validated);
 
         return $this->jsonResponse(
             message: 'Watchlist updated',
@@ -203,7 +205,6 @@ final class WatchlistController extends BaseController
         );
     }
 
-
     /**
      * Get trending public watchlists.
      */
@@ -234,5 +235,50 @@ final class WatchlistController extends BaseController
             ->get();
 
         return response()->json($watchlists);
+    }
+
+    public function curated(): JsonResponse
+    {
+        /** @var SystemListService $systemListService */
+        $systemListService = app(SystemListService::class);
+        $curatedLists = $systemListService->getCuratedLists();
+
+        return $this->jsonResponse(
+            message: 'Curated watchlists',
+            data: $curatedLists
+        );
+    }
+
+    public function automated(Request $request, ?string $slug = null): JsonResponse
+    {
+        $columns = [
+            'slug',
+            'name',
+            'type',
+            'poster',
+            'description',
+            'created_at',
+            'updated_at',
+        ];
+        if ($slug) {
+            $list = SystemList::whereSlug($slug)->firstOrFail();
+
+            return $this->jsonResponse(
+                message: 'success',
+                data: $list->only($columns) + [
+                    'items' => $list->items,
+                ]
+            );
+        } else {
+            $autoLists = SystemList::latest()->paginate(
+                perPage: $request->input('limit', 10),
+                columns: $columns
+            )->toArray();
+
+            return $this->jsonResponse(
+                message: 'Automated watchlists',
+                data: $autoLists
+            );
+        }
     }
 }

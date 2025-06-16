@@ -36,6 +36,8 @@ final class TmdbTransformer
             'searchResult' => $this->transformSearchResult($this->data, $option),
             // 'watchProvider' => $this->transform(),
             'review' => $this->transformReview($this->data),
+
+            'customList' => $this->transformCustomList($this->data),
 			default => throw new Exception('Invalid type')
 		};
 	}
@@ -161,6 +163,19 @@ final class TmdbTransformer
             'summary' => strip_tags(Str::limit($data['content'], 200)),
             'content' => $data['content'],
             'date' => $data['updated_at'],
+        ];
+    }
+
+    private function transformCustomList(array $data): array
+    {
+        return [
+            'id' => $data['id'],
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'number_of_items' => $data['number_of_items'],
+            'imageUrl' => $this->formatImageUrl($data['poster_path'] ?? $data['backdrop_path'], "medium"),
+            'created_at' => $data['created_at'],
+            'updated_at' => $data['updated_at'],
         ];
     }
 

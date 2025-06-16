@@ -24,6 +24,9 @@ Route::group(['prefix' => '/discover'], function() {
    Route::get('/featured/{type?}', [DiscoverController::class, 'featured']);
 });
 
+Route::get('/watchlist/curated/{id?}', [WatchlistController::class, 'curated']);
+Route::get('/watchlist/automated/{slug?}', [WatchlistController::class, 'automated']);
+
 Route::get('/search/{type?}', [DiscoverController::class, 'search']);
 
 Route::middleware('auth:api')->group(function() {
