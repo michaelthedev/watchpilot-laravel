@@ -17,7 +17,7 @@ final class WatchlistController extends BaseController
     public function index(): JsonResponse
     {
         $watchlists = $this->getUser()->watchlists()
-            ->withCount('media')
+            ->withCount('items')
             ->orderBy('name')
             ->get();
 
