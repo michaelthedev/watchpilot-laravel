@@ -64,12 +64,4 @@ final class LibraryController extends BaseController
             ]
         );
     }
-
-    public function watching(): JsonResponse
-    {
-        return $this->jsonResponse(
-            message: 'success',
-            data: $this->getUser()->watching()->paginate()
-        );
-    }
 }

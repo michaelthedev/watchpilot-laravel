@@ -47,11 +47,6 @@ Route::middleware('auth:api')->group(function() {
         Route::get('/likes', [LibraryController::class, 'likes']);
         Route::patch('/likes', [LibraryController::class, 'toggleLike']);
 
-        // watching
-        Route::get('/watching', [LibraryController::class, 'watching']);
-        Route::post('/watching', [LibraryController::class, 'addWatching']);
-        Route::delete('/watching', [LibraryController::class, 'deleteWatching']);
-
         Route::post('/sync', []);
     });
 });
