@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -38,5 +40,14 @@ final class Watchlist extends Model
     public function isPublic(): bool
     {
         return $this->visibility == 'public';
+    }
+
+    #[Scope]
+    protected function canBeViewed(Builder $query, ?User $user = null): void
+    {
+        $query->where(function($query) use($user) {
+            $query->whereVisibility('public')
+                ->orWhereBelongsTo($user);
+        });
     }
 }
