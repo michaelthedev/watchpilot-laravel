@@ -29,34 +29,16 @@ final class WatchlistController extends BaseController
 
     public function show(string $uid): JsonResponse
     {
-        $watchlist = Watchlist::where('uid', $uid)
-            ->with('items')
-            ->first();
+        $watchlist = Watchlist::whereUid($uid)
+            ->with('items.media')
+            ->canBeViewed($this->getUser())
+            ->firstOrFail();
 
-        if (!$watchlist) {
-            return $this->jsonResponse(
-                message: 'Watchlist not found',
-                status: 404
-            );
-        }
-
-        $user = $this->getUser();
-
-        // Check if watchlist belongs to user or is public
-        if ($watchlist->user_id !== $user?->id && !$watchlist->isPublic()) {
-            return $this->jsonResponse(
-                message: 'Unauthorized',
-                status: 403
-            );
-        }
-
-        if ($watchlist->isPublic() && $watchlist->user_id !== $user?->id) {
-            $watchlist->incrementViews();
-        }
+        $watchlist->incrementViews();
 
         return $this->jsonResponse(
             message: 'Watchlist details',
-            data: $watchlist->with('media')->get()
+            data: $watchlist
         );
     }
 
