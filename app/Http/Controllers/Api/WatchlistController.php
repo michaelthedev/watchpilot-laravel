@@ -111,6 +111,18 @@ final class WatchlistController extends BaseController
 
     /** Watchlist Items */
 
+    public function items(string $uid): JsonResponse
+    {
+        $watchlist = Watchlist::whereUid($uid)
+            ->canBeViewed($this->getUser())
+            ->firstOrFail();
+
+        return $this->jsonResponse(
+            message: 'Watchlist items',
+            data: $watchlist->items()->with('media')->paginate()
+        );
+    }
+
     public function addItem(Request $request, string $uid): JsonResponse
     {
         $validated = $request->validate([
