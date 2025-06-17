@@ -10,15 +10,10 @@ use Illuminate\Support\Facades\Http;
 class TmdbClient
 {
     protected PendingRequest $http;
-    protected string $account_id;
-
-    public function __construct() {
-        $this->account_id = config('tmdb.account_id');
-    }
 
     final protected function _getAccountId(): string
     {
-        return $this->account_id;
+        return config('tmdb.account_id');
     }
 
     final protected function getClient(int $v = 3): PendingRequest

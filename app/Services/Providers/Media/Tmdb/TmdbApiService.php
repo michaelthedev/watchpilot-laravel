@@ -21,7 +21,6 @@ final class TmdbApiService extends TmdbClient
         private readonly TmdbTransformer $transformer
     ) {
         $this->http = $this->getClient();
-        parent::__construct();
     }
 
 	public function getProviderName(): string
