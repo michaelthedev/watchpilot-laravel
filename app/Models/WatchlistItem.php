@@ -9,6 +9,10 @@ final class WatchlistItem extends Model
 {
     protected $guarded = ['id'];
 
+    protected $hidden = [
+        'id', 'watchlist_id', 'media_id'
+    ];
+
     public function watchlist(): BelongsTo
     {
         return $this->belongsTo(Watchlist::class);
