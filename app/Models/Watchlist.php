@@ -34,7 +34,7 @@ final class Watchlist extends Model
 
     public function incrementViews(): void
     {
-        $this->increment('view_count');
+        $this->increment('views');
     }
 
     public function isPublic(): bool
